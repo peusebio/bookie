@@ -23,30 +23,83 @@ class AlbumTableViewController: UITableViewController, AlbumTableViewControllerD
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cellId")
+        title = "HipHop FM"
+        
+        tableView.prefetchDataSource = self
+        tableView.register(AlbumCell.self, forCellReuseIdentifier: "cellId")
         viewModel.fetchAlbums()
-        // Do any additional setup after loading the view.
-    }
-    
-    func reloadData(){
-        self.tableView.reloadData()
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cellId", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cellId", for: indexPath) as! AlbumCell
         
-        let album = viewModel.albumAt(index: indexPath.row)
-        cell.textLabel?.text = album.name
+        if indexPath.row < viewModel.currentAlbumsCount() {
+            let album = viewModel.albumAt(index: indexPath.row)
+            cell.setup(with: album)
+            
+            if let albumImage = viewModel.imageData(forHeroAt: indexPath.row){
+                cell.updateImage(imageData: albumImage)
+            } else {
+                cell.updateImage(imageData: .none)
+                viewModel.loadAlbumImage(albumIndex: indexPath.row)
+            }
+        } else {
+            cell.setup(with: .none)
+        }
+        
         return cell
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.albumsCount()
+        return viewModel.totalAlbumsCount()
     }
     
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        100
+    }
+    
+    func fetchCompleted(with newIndexPathsToReload: [IndexPath]?){
+        DispatchQueue.main.async {
+            guard let newIndexPathsToReload = newIndexPathsToReload else {
+                self.tableView.isHidden = false
+                self.tableView.reloadData()
+                return
+            }
+            let indexPathsToReload = self.visibleIndexPathsToReload(intersecting: newIndexPathsToReload)
+            self.tableView.reloadRows(at: indexPathsToReload, with: .automatic)
+        }
+    }
+    
+    func updateAlbumImage(cellRowIndex: Int, thumbnailData: Data) {
+        let indexPath = IndexPath(row: cellRowIndex, section: 0)
+
+        if let cell = tableView.cellForRow(at: indexPath) as? AlbumCell {
+            cell.updateImage(imageData: thumbnailData)
+        }
+    }
+}
+
+extension AlbumTableViewController: UITableViewDataSourcePrefetching {
+    
+    func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
+        if indexPaths.contains(where: isLoadingCell) {
+            viewModel.fetchAlbums()
+        }
+    }
+    
+    func isLoadingCell(for indexPath: IndexPath) -> Bool {
+        return indexPath.row >= viewModel.currentAlbumsCount()
+    }
+    
+    func visibleIndexPathsToReload(intersecting indexPaths: [IndexPath]) -> [IndexPath] {
+        let indexPathsForVisibleRows = tableView.indexPathsForVisibleRows ?? []
+        let indexPathsIntersection = Set(indexPathsForVisibleRows).intersection(indexPaths)
+        return Array(indexPathsIntersection)
+    }
 }
 
 protocol AlbumTableViewControllerDelegate {
-    func reloadData()
+    func fetchCompleted(with newIndexPathsToReload: [IndexPath]?)
+    func updateAlbumImage(cellRowIndex: Int, thumbnailData: Data)
 }
 
