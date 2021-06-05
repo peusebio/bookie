@@ -6,3 +6,7 @@
 //
 
 import Foundation
+
+struct Wiki: Decodable{
+    let published: String
+}

@@ -7,12 +7,12 @@
 
 import Foundation
 
-struct AlbumListRequest {
+struct TopAlbumListRequest {
     
     let parameters: [String : String]
     
-    static func with(tag: String, page: Int) -> AlbumListRequest{
-        let parameters = ["tag" : tag, "method" : "tag.gettopalbums", "format": "json", "page": "\(page)"]
-            return AlbumListRequest(parameters: parameters)
+    static func with(tag: String, page: Int) -> TopAlbumListRequest{
+        let parameters = ["tag" : tag, "method" : "tag.gettopalbums", "page": "\(page)"]
+            return TopAlbumListRequest(parameters: parameters)
     }
 }

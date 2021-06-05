@@ -6,3 +6,7 @@
 //
 
 import Foundation
+
+struct ArtistResponse: Decodable{
+    let artist: Artist
+}

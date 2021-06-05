@@ -6,3 +6,9 @@
 //
 
 import Foundation
+
+struct Artist: Decodable {
+    let name: String
+    let mbid: String?
+    let stats: ArtistStats?
+}

@@ -6,3 +6,12 @@
 //
 
 import Foundation
+
+struct AlbumRequest {
+    let parameters: [String : String]
+    
+    static func with(mbid: String) -> AlbumRequest{
+        let parameters = ["method" : "album.getinfo", "mbid": "\(mbid)"]
+            return AlbumRequest(parameters: parameters)
+    }
+}

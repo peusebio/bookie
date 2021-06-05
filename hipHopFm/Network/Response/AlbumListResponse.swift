@@ -8,5 +8,5 @@
 import Foundation
 
 struct AlbumListResponse: Decodable {
-    let albums: AlbumListWrapper
+    let albums: TopAlbumListWrapper
 }

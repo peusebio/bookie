@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct AlbumListWrapper: Decodable {
+struct TopAlbumListWrapper: Decodable {
     let album: [TopAlbum]
     let requestAttributes: RequestAttributes
     

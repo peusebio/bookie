@@ -7,12 +7,13 @@
 
 import Foundation
 
-class AlbumTableViewModel {
+class TopAlbumTableViewModel {
     
     private let client: LastFMRestClient
-    private var isFetchInProgress = false
+    private var isTopAlbumFetchInProgress = false
     
-    private var albums: [TopAlbum]
+    private var topAlbums: [TopAlbum]
+    private var albums: [Album]
     private var totalNumberOfAlbums: Int = 0
     private var nextPageToFetch: Int = 1
     private let numberOfAlbumsPerRequest: Int = 50
@@ -23,8 +24,9 @@ class AlbumTableViewModel {
     private var albumsImageData: [Int : Data] = [:]
     
     init(){
-        albums = [TopAlbum]()
-        client = LastFMRestClient()
+        topAlbums = [TopAlbum]()
+        albums = [Album]()
+        client = LastFMRestClient.shared
     }
     
     func setDelegate(delegate: AlbumTableViewControllerDelegate) {
@@ -32,22 +34,22 @@ class AlbumTableViewModel {
     }
     
     func fetchAlbums(){
-        guard !isFetchInProgress else {
+        guard !isTopAlbumFetchInProgress else {
             return
         }
         
-        isFetchInProgress = true
+        isTopAlbumFetchInProgress = true
         
-        LastFMRestClient().getAlbums(with: AlbumListRequest.with(tag: "hiphop", page: nextPageToFetch), onResponseReceived: responseReceived)
+        client.getTopAlbums(with: TopAlbumListRequest.with(tag: "hiphop", page: nextPageToFetch), onResponseReceived: topAlbumsResponseReceived)
     }
     
-    func responseReceived(albumsFromResponse: AlbumListResponse){
-        albums.append(contentsOf: albumsFromResponse.albums.album.suffix(numberOfAlbumsPerRequest))
+    func topAlbumsResponseReceived(albumsFromResponse: AlbumListResponse){
+        topAlbums.append(contentsOf: albumsFromResponse.albums.album.suffix(numberOfAlbumsPerRequest))
         
         totalNumberOfAlbums = Int(albumsFromResponse.albums.requestAttributes.total) ?? 0
         let attributes = albumsFromResponse.albums.requestAttributes
         
-        if albums.count < numberOfAlbumsToFetch {
+        if topAlbums.count < numberOfAlbumsToFetch {
             self.nextPageToFetch+=1
         }
         
@@ -57,15 +59,15 @@ class AlbumTableViewModel {
         } else {
             self.delegate?.fetchCompleted(with: .none)
         }
-        self.isFetchInProgress = false
+        self.isTopAlbumFetchInProgress = false
     }
     
     func loadAlbumImage(albumIndex: Int) {
         DispatchQueue.global().async { [weak self] in
             
-            let album = self?.albums[albumIndex]
+            let album = self?.topAlbums[albumIndex]
             
-            let imageUrl = album!.image[2].text
+            let imageUrl = album!.image[3].text
             
             if !imageUrl.isEmpty {
                 let url = URL(string: imageUrl)! as URL
@@ -80,13 +82,13 @@ class AlbumTableViewModel {
     }
     
     private func calculateIndexPathsToReload(from newAlbums: [TopAlbum]) -> [IndexPath] {
-        let startIndex = albums.count - newAlbums.count
+        let startIndex = topAlbums.count - newAlbums.count
         let endIndex = startIndex + newAlbums.count
         return (startIndex..<endIndex).map { IndexPath(row: $0, section: 0) }
     }
     
     func albumAt(index: Int) -> TopAlbum {
-        return albums[index]
+        return topAlbums[index]
     }
     
     func totalAlbumsCount() -> Int {
@@ -94,10 +96,10 @@ class AlbumTableViewModel {
     }
     
     func currentAlbumsCount() -> Int {
-        return albums.count
+        return topAlbums.count
     }
     
-    func imageData(forHeroAt index: Int) -> Data?{
+    func imageData(forAlbumAt index: Int) -> Data?{
         return albumsImageData[index]
     }
     

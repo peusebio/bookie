@@ -6,3 +6,7 @@
 //
 
 import Foundation
+
+struct ArtistStats: Decodable {
+    let listeners: String
+}

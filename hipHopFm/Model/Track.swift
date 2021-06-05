@@ -6,3 +6,7 @@
 //
 
 import Foundation
+
+struct Track: Decodable {
+    let name: String
+}

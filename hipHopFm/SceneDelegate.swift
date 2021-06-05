@@ -18,7 +18,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         
         let navigationController = UINavigationController()
-        navigationController.pushViewController(AlbumTableViewController(nibName: nil, bundle: nil), animated: false)
+        navigationController.pushViewController(TopAlbumTableViewController(nibName: nil, bundle: nil), animated: false)
         
         window = UIWindow(frame: UIScreen.main.bounds)
         

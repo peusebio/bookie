@@ -6,3 +6,96 @@
 //
 
 import Foundation
+import UIKit
+
+class AlbumDetailViewController: UIViewController {
+    
+    let albumMbid: String
+    let artistMbid: String
+    
+    let albumDetailView: AlbumDetailView
+    let viewModel: AlbumDetailViewModel
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        fetchAlbumInfo()
+        fetchArtistInfo()
+        view.backgroundColor = Color.random()
+        addAlbumDetailView(albumDetailView: albumDetailView)
+    }
+    
+    init(albumMbid: String, artistMbid: String, albumName: String, artistName: String, albumImageData: Data?, albumImageUrl: String, nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        self.albumMbid = albumMbid
+        self.artistMbid = artistMbid
+        albumDetailView = AlbumDetailView(albumName: albumName, artistName: artistName)
+        viewModel = AlbumDetailViewModel()
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        
+        albumDetailView.translatesAutoresizingMaskIntoConstraints = false
+        
+        if let imageData = albumImageData {
+            albumDetailView.setupImage(imageData: imageData)
+        } else {
+            fetchAlbumImage(imageUrl: albumImageUrl)
+        }
+        
+        viewModel.delegate = self
+    }
+    
+    func fetchAlbumInfo(){
+        DispatchQueue.global().async {
+            self.viewModel.fetchAlbumInfo(mbid: self.albumMbid)
+        }
+    }
+    
+    func fetchArtistInfo(){
+        DispatchQueue.global().async {
+            self.viewModel.fetchArtistInfo(mbid: self.artistMbid)
+        }
+    }
+    
+    func fetchAlbumImage(imageUrl: String){
+        DispatchQueue.global().async {
+            self.viewModel.fetchAlbumImage(imageUrl: imageUrl)
+        }
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func addAlbumDetailView(albumDetailView: AlbumDetailView) {
+        view.addSubview(albumDetailView)
+        
+        view.addConstraint(NSLayoutConstraint(item: albumDetailView, attribute: .leadingMargin, relatedBy: .equal, toItem: view, attribute: .leadingMargin, multiplier: 1, constant: 0))
+        
+        view.addConstraint(NSLayoutConstraint(item: albumDetailView, attribute: .topMargin, relatedBy: .equal, toItem: view, attribute: .topMargin, multiplier: 1, constant: 0))
+        
+        view.addConstraint(NSLayoutConstraint(item: albumDetailView, attribute: .trailingMargin, relatedBy: .equal, toItem: view, attribute: .trailingMargin, multiplier: 1, constant: 0))
+        
+        view.addConstraint(NSLayoutConstraint(item: albumDetailView, attribute: .bottomMargin, relatedBy: .equal, toItem: view, attribute: .bottomMargin, multiplier: 1, constant: 0))
+    }
+}
+
+extension AlbumDetailViewController: AlbumDetailViewControllerDelegate {
+    
+    func albumInfoFetchCompleted(albumFromResponse: AlbumResponse) {
+        albumDetailView.setup(album: albumFromResponse.album, artist: .none)
+        //albumDetailView.setNeedsDisplay()
+    }
+    
+    func artistInfoFetchCompleted(artistFromResponse: ArtistResponse) {
+        albumDetailView.setup(album: .none, artist: artistFromResponse.artist)
+        //albumDetailView.setNeedsDisplay()
+    }
+    
+    func albumImageFetchCompleted(imageData: Data){
+        albumDetailView.setupImage(imageData: imageData)
+    }
+}
+
+protocol AlbumDetailViewControllerDelegate {
+    func albumInfoFetchCompleted(albumFromResponse: AlbumResponse)
+    func artistInfoFetchCompleted(artistFromResponse: ArtistResponse)
+    func albumImageFetchCompleted(imageData: Data)
+}

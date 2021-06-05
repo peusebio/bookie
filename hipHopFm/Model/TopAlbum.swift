@@ -6,3 +6,10 @@
 //
 
 import Foundation
+
+struct TopAlbum: Decodable {
+    let name: String
+    let mbid: String
+    let image: [Image]
+    let artist: TopAlbumArtist
+}
