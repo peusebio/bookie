@@ -10,6 +10,7 @@ import UIKit
 class TopAlbumTableViewController: UITableViewController, AlbumTableViewControllerDelegate {
     
     let viewModel: TopAlbumTableViewModel
+    private var firstAccessoryButtonTapOccurred: Bool = false
     
     override init(nibName nibNameOrNil: String!, bundle nibBundleOrNil: Bundle!){
         viewModel = TopAlbumTableViewModel()
@@ -70,6 +71,15 @@ class TopAlbumTableViewController: UITableViewController, AlbumTableViewControll
         let albumDetailViewController = AlbumDetailViewController(albumMbid: albumMbid, artistMbid: artistMbid, albumName: album.name, artistName: album.artist.name, albumImageData: albumImageData, albumImageUrl: albumImageUrl, nibName: .none, bundle: .none)
         
         navigationController?.pushViewController(albumDetailViewController, animated: false)
+        
+        userDidTapAlbumCellAccessoryButton()
+    }
+    
+    private func userDidTapAlbumCellAccessoryButton() {
+        if(!firstAccessoryButtonTapOccurred){
+            firstAccessoryButtonTapOccurred.toggle()
+            AppStoreReview.showReviewDialogIfNecessary()
+        }
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
