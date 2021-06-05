@@ -33,7 +33,9 @@ class AlbumTableViewController: UITableViewController, AlbumTableViewControllerD
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cellId", for: indexPath) as! AlbumCell
         
-        if indexPath.row < viewModel.currentAlbumsCount() {
+        if indexPath.row >= viewModel.currentAlbumsCount() {
+            cell.setup(with: .none)
+        } else {
             let album = viewModel.albumAt(index: indexPath.row)
             cell.setup(with: album)
             
@@ -43,15 +45,13 @@ class AlbumTableViewController: UITableViewController, AlbumTableViewControllerD
                 cell.updateImage(imageData: .none)
                 viewModel.loadAlbumImage(albumIndex: indexPath.row)
             }
-        } else {
-            cell.setup(with: .none)
         }
         
         return cell
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.totalAlbumsCount()
+        return viewModel.maximumNumberOfAlbumsToFetch()
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {

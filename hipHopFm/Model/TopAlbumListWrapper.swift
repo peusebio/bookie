@@ -8,7 +8,7 @@
 import Foundation
 
 struct AlbumListWrapper: Decodable {
-    let album: [Album]
+    let album: [TopAlbum]
     let requestAttributes: RequestAttributes
     
     enum CodingKeys: String, CodingKey {

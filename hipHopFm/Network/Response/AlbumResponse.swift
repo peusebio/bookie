@@ -6,3 +6,7 @@
 //
 
 import Foundation
+
+struct AlbumResponse: Decodable {
+    let album: Album
+}

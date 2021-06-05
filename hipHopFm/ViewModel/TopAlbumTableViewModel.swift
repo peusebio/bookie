@@ -12,17 +12,18 @@ class AlbumTableViewModel {
     private let client: LastFMRestClient
     private var isFetchInProgress = false
     
-    private var albums: [Album]
+    private var albums: [TopAlbum]
     private var totalNumberOfAlbums: Int = 0
     private var nextPageToFetch: Int = 1
     private let numberOfAlbumsPerRequest: Int = 50
+    private let numberOfAlbumsToFetch: Int = 1000
     
     private var delegate: AlbumTableViewControllerDelegate?
     
     private var albumsImageData: [Int : Data] = [:]
     
     init(){
-        albums = [Album]()
+        albums = [TopAlbum]()
         client = LastFMRestClient()
     }
     
@@ -46,7 +47,7 @@ class AlbumTableViewModel {
         totalNumberOfAlbums = Int(albumsFromResponse.albums.requestAttributes.total) ?? 0
         let attributes = albumsFromResponse.albums.requestAttributes
         
-        if Int(attributes.page)! < Int(attributes.totalPages)! {
+        if albums.count < numberOfAlbumsToFetch {
             self.nextPageToFetch+=1
         }
         
@@ -78,13 +79,13 @@ class AlbumTableViewModel {
         }
     }
     
-    private func calculateIndexPathsToReload(from newAlbums: [Album]) -> [IndexPath] {
+    private func calculateIndexPathsToReload(from newAlbums: [TopAlbum]) -> [IndexPath] {
         let startIndex = albums.count - newAlbums.count
         let endIndex = startIndex + newAlbums.count
         return (startIndex..<endIndex).map { IndexPath(row: $0, section: 0) }
     }
     
-    func albumAt(index: Int) -> Album {
+    func albumAt(index: Int) -> TopAlbum {
         return albums[index]
     }
     
@@ -98,5 +99,9 @@ class AlbumTableViewModel {
     
     func imageData(forHeroAt index: Int) -> Data?{
         return albumsImageData[index]
+    }
+    
+    func maximumNumberOfAlbumsToFetch() -> Int {
+        return numberOfAlbumsToFetch
     }
 }
