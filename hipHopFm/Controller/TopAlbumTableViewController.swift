@@ -24,10 +24,14 @@ class TopAlbumTableViewController: UITableViewController, AlbumTableViewControll
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         title = "HipHop FM"
         
+        tableView = UITableView(frame: .zero, style: .grouped)
         tableView.prefetchDataSource = self
         tableView.register(TopAlbumCell.self, forCellReuseIdentifier: "cellId")
+        tableView.showsVerticalScrollIndicator = false
+    
         viewModel.fetchAlbums()
     }
     
@@ -56,9 +60,25 @@ class TopAlbumTableViewController: UITableViewController, AlbumTableViewControll
         return cell
     }
     
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        50
+    }
     
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        "Top HipHop Albums"
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        
+        let backgroundView = UIView()
+        
+        let label = UILabel()
+        label.text = "Top HipHop Albums"
+        label.font = UIFont(name: "Avenir-Heavy", size: 20)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        backgroundView.addSubview(label)
+        
+        backgroundView.addConstraint(NSLayoutConstraint(item: label, attribute: .leadingMargin, relatedBy: .equal, toItem: backgroundView, attribute: .leadingMargin, multiplier: 1, constant: 10))
+        
+        backgroundView.addConstraint(NSLayoutConstraint(item: label, attribute: .centerY, relatedBy: .equal, toItem: backgroundView, attribute: .centerY, multiplier: 1, constant: 0))
+        
+        return backgroundView
     }
     
     override func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {

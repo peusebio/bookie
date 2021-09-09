@@ -11,11 +11,11 @@ import UIKit
 class AlbumDetailView: UIView {
     
     private let mainScreen = UIScreen.main
+    //private static let defaultLayoutMargins = UIEdgeInsets(top: -20, left: 0, bottom: 0, right: 0)
     
     init (albumName: String, artistName: String){
         super.init(frame: mainScreen.bounds)
         translatesAutoresizingMaskIntoConstraints = false
-        setupSubviews()
         albumNameLabel.text = albumName
         artistNameLabel.text = artistName
     }
@@ -28,9 +28,9 @@ class AlbumDetailView: UIView {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = ContentMode.scaleAspectFill
-        imageView.layer.cornerRadius = 15
+        imageView.layer.cornerRadius = 5
         imageView.layer.masksToBounds = true
-        imageView.layoutMargins = UIEdgeInsets(top: -20, left: 0, bottom: 0, right: 0)
+        //imageView.layoutMargins = defaultLayoutMargins
         return imageView
     }()
     
@@ -47,7 +47,6 @@ class AlbumDetailView: UIView {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont(name: "Avenir", size: 19)
         label.textColor = Color.artistNameTextColor
-        label.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         return label;
     }()
     
@@ -55,7 +54,7 @@ class AlbumDetailView: UIView {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont(name: "Avenir", size: 18)
-        label.layoutMargins = UIEdgeInsets(top: -20, left: 0, bottom: 0, right: 0)
+        //label.layoutMargins = defaultLayoutMargins
         return label;
     }()
     
@@ -63,7 +62,7 @@ class AlbumDetailView: UIView {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont(name: "Avenir", size: 18)
-        label.layoutMargins = UIEdgeInsets(top: -20, left: 0, bottom: 0, right: 0)
+        //label.layoutMargins = defaultLayoutMargins
         return label;
     }()
     
@@ -71,88 +70,123 @@ class AlbumDetailView: UIView {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont(name: "Avenir", size: 18)
-        label.layoutMargins = UIEdgeInsets(top: -20, left: 0, bottom: 0, right: 0)
+        //label.layoutMargins = defaultLayoutMargins
         return label;
     }()
     
-    private func setupSubviews(){
-        addSubview(albumImageView)
-        addSubview(albumNameLabel)
-        addSubview(artistNameLabel)
-        addSubview(trackCountLabel)
-        addSubview(publishDateLabel)
-        addSubview(artistNumberOfListenersLabel)
+    var albumTrackView: UIView = {
+       let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        //view.layoutMargins = defaultLayoutMargins
+        return view;
         
-        //ALBUM IMAGE VIEW
-        addConstraint(NSLayoutConstraint(item: albumImageView, attribute: .topMargin, relatedBy: .equal, toItem: self, attribute: .topMargin, multiplier: 1, constant: 0))
+    }()
+    
+    func setupAlbumInfoSubviews(album: Album){
+        if let empty = album.image.first?.text.isEmpty {
+            if !empty {
+                addSubview(albumImageView)
+                
+                //ALBUM IMAGE VIEW
+                addConstraint(NSLayoutConstraint(item: albumImageView, attribute: .topMargin, relatedBy: .equal, toItem: self, attribute: .topMargin, multiplier: 1, constant: 100))
+                
+                addConstraint(NSLayoutConstraint(item: albumImageView, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 1))
+                
+                addConstraint(NSLayoutConstraint(item: albumImageView, attribute: .width, relatedBy: .equal, toItem: self, attribute: .width, multiplier: 2/3, constant: 1))
+                
+                addConstraint(NSLayoutConstraint(item: albumImageView, attribute: .height, relatedBy: .equal, toItem: self, attribute: .width, multiplier: 2/3, constant: 1))
+            }
+        }
         
-        addConstraint(NSLayoutConstraint(item: albumImageView, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 0))
+        if !album.name.isEmpty {
+            let lastSubview = subviews.last
+            addSubview(albumNameLabel)
+            
+            //ALBUM NAME LABEL
+            addConstraint(NSLayoutConstraint(item: albumNameLabel, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 1))
+            
+            addConstraint(NSLayoutConstraint(item: albumNameLabel, attribute: .topMargin, relatedBy: .equal, toItem: lastSubview, attribute: .bottomMargin, multiplier: 1, constant: 10))
+        }
         
-        addConstraint(NSLayoutConstraint(item: albumImageView, attribute: .width, relatedBy: .equal, toItem: self, attribute: .width, multiplier: 2/3, constant: 1))
+        if !album.artist.isEmpty {
+            let lastSubview = subviews.last
+            addSubview(artistNameLabel)
+            
+            //ARTIST NAME LABEL
+            addConstraint(NSLayoutConstraint(item: artistNameLabel, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 1))
+            
+            addConstraint(NSLayoutConstraint(item: artistNameLabel, attribute: .topMargin, relatedBy: .equal, toItem: lastSubview, attribute: .bottomMargin, multiplier: 1, constant: 10))
+        }
         
-        addConstraint(NSLayoutConstraint(item: albumImageView, attribute: .height, relatedBy: .equal, toItem: self, attribute: .height, multiplier: 0.3, constant: 1))
+        if !album.tracks.track.isEmpty {
+            var lastSubview = subviews.last
+            addSubview(trackCountLabel)
+            
+            //TRACK COUNT LABEL
+            addConstraint(NSLayoutConstraint(item: trackCountLabel, attribute: .topMargin, relatedBy: .equal, toItem: lastSubview, attribute: .bottomMargin, multiplier: 1, constant: 30))
+            addConstraint(NSLayoutConstraint(item: trackCountLabel, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 1))
+            
+//            lastSubview = subviews.last
+//            addSubview(albumTrackView)
+//
+//            //ALBUM TRACK VIEW
+//            addConstraint(NSLayoutConstraint(item: albumTrackView, attribute: .topMargin, relatedBy: .equal, toItem: lastSubview, attribute: .bottomMargin, multiplier: 1, constant: 30))
+//            addConstraint(NSLayoutConstraint(item: albumTrackView, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 1))
+        }
         
-        //ALBUM NAME LABEL
-        addConstraint(NSLayoutConstraint(item: albumNameLabel, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 0))
-        
-        addConstraint(NSLayoutConstraint(item: albumNameLabel, attribute: .topMargin, relatedBy: .equal, toItem: albumImageView, attribute: .bottomMargin, multiplier: 1, constant: 0))
-        
-        //ARTIST NAME LABEL
-        addConstraint(NSLayoutConstraint(item: artistNameLabel, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 0))
-        
-        addConstraint(NSLayoutConstraint(item: artistNameLabel, attribute: .topMargin, relatedBy: .equal, toItem: albumNameLabel, attribute: .bottomMargin, multiplier: 1, constant: 0))
-        
-        //addConstraint(NSLayoutConstraint(item: artistNameLabel, attribute: .trailingMargin, relatedBy: .equal, toItem: self, attribute: .trailingMargin, multiplier: 1, constant: -10))
-        
-        //TRACK COUNT LABEL
-        //addConstraint(NSLayoutConstraint(item: trackCountLabel, attribute: .leadingMargin, relatedBy: .equal, toItem: self, attribute: .leadingMargin, multiplier: 1, constant: 25))
-        
-        addConstraint(NSLayoutConstraint(item: trackCountLabel, attribute: .topMargin, relatedBy: .equal, toItem: artistNameLabel, attribute: .bottomMargin, multiplier: 1, constant: 0))
-        addConstraint(NSLayoutConstraint(item: trackCountLabel, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 0))
-        
-        //addConstraint(NSLayoutConstraint(item: trackCountLabel, attribute: .trailingMargin, relatedBy: .equal, toItem: self, attribute: .trailingMargin, multiplier: 1, constant: -10))
-        
-        //PUBLISH DATE LABEL
-        //addConstraint(NSLayoutConstraint(item: publishDateLabel, attribute: .leadingMargin, relatedBy: .equal, toItem: self, attribute: .leadingMargin, multiplier: 1, constant: 25))
-        
-        addConstraint(NSLayoutConstraint(item: publishDateLabel, attribute: .topMargin, relatedBy: .equal, toItem: trackCountLabel, attribute: .bottomMargin, multiplier: 1, constant: 0))
-        
-        addConstraint(NSLayoutConstraint(item: publishDateLabel, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 0))
-        
-        //addConstraint(NSLayoutConstraint(item: publishDateLabel, attribute: .trailingMargin, relatedBy: .equal, toItem: self, attribute: .trailingMargin, multiplier: 1, constant: -10))
-        
-        //NUMBER OF LISTENERS LABEL
-        //addConstraint(NSLayoutConstraint(item: artistNumberOfListenersLabel, attribute: .leadingMargin, relatedBy: .equal, toItem: self, attribute: .leadingMargin, multiplier: 1, constant: 25))
-        
-        addConstraint(NSLayoutConstraint(item: artistNumberOfListenersLabel, attribute: .topMargin, relatedBy: .equal, toItem: publishDateLabel, attribute: .bottomMargin, multiplier: 1, constant: 0))
-        
-        addConstraint(NSLayoutConstraint(item: artistNumberOfListenersLabel, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 0))
-        
-        //addConstraint(NSLayoutConstraint(item: artistNumberOfListenersLabel, attribute: .trailingMargin, relatedBy: .equal, toItem: self, attribute: .trailingMargin, multiplier: 1, constant: -10))
+        if let empty = album.wiki?.published.isEmpty {
+            if !empty {
+                let lastSubview = subviews.last
+                addSubview(publishDateLabel)
+                
+                //PUBLISH DATE LABEL
+                addConstraint(NSLayoutConstraint(item: publishDateLabel, attribute: .topMargin, relatedBy: .equal, toItem: lastSubview, attribute: .bottomMargin, multiplier: 1, constant: 30))
+                
+                addConstraint(NSLayoutConstraint(item: publishDateLabel, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 0))
+            }
+        }
     }
     
-    func setup(album: Album?, artist: Artist?) {
-        if let album = album {
-            let numberOfTracks = album.tracks.track.count
-            if numberOfTracks > 0 {
-                trackCountLabel.text = "ℹ️ \(numberOfTracks) tracks"
-            } else {
-                trackCountLabel.layoutMargins = .zero
-            }
-            if let wiki = album.wiki {
-                publishDateLabel.text = "🗓 Released \(wiki.published.prefix(11))"
-            } else {
-                publishDateLabel.layoutMargins = .zero
-            }
+    func setupArtistInfoSubviews(artist: Artist) {
+        
+        if !(artist.stats?.listeners.isEmpty)! {
+            let lastSubview = subviews.last
+            addSubview(artistNumberOfListenersLabel)
+            
+            //NUMBER OF LISTENERS LABEL
+            addConstraint(NSLayoutConstraint(item: artistNumberOfListenersLabel, attribute: .topMargin, relatedBy: .equal, toItem: lastSubview, attribute: .bottomMargin, multiplier: 1, constant: 30))
+            
+            addConstraint(NSLayoutConstraint(item: artistNumberOfListenersLabel, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 0))
+        }
+    }
+    
+    func setupAlbumInfo(album: Album, albumTrackView: UIView) {
+        let numberOfTracks = album.tracks.track.count
+        if numberOfTracks > 0 {
+//            self.albumTrackView = albumTrackView
+//            self.albumTrackView.translatesAutoresizingMaskIntoConstraints = false
+//            self.albumTrackView.setNeedsDisplay()
+            trackCountLabel.text = "💿 \(numberOfTracks) tracks"
+        } else {
+//            trackCountLabel.layoutMargins = .zero
+//            self.albumTrackView.layoutMargins = .zero
+        }
+        if let wiki = album.wiki {
+            publishDateLabel.text = "🗓 Released \(wiki.published.prefix(11))"
+        } else {
+//            publishDateLabel.layoutMargins = .zero
+        }
+        setNeedsDisplay()
+        setNeedsLayout()
+    }
+    
+    func setupArtistInfo(artist: Artist) {
+        if let stats = artist.stats {
+            artistNumberOfListenersLabel.text = "🎧 \(stats.listeners) people listen to this artist"
+        } else {
+//            artistNumberOfListenersLabel.layoutMargins = .zero
         }
         
-        if let artist = artist {
-            if let stats = artist.stats {
-                artistNumberOfListenersLabel.text = "🎧 \(stats.listeners) people listen to this artist"
-            } else {
-                artistNumberOfListenersLabel.layoutMargins = .zero
-            }
-        }
     }
     
     func setupImage(imageData: Data?) {

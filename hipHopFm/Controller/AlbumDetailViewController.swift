@@ -19,7 +19,6 @@ class AlbumDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         fetchAlbumInfo()
-        fetchArtistInfo()
         view.backgroundColor = Color.random()
         addAlbumDetailView(albumDetailView: albumDetailView)
     }
@@ -80,13 +79,21 @@ class AlbumDetailViewController: UIViewController {
 extension AlbumDetailViewController: AlbumDetailViewControllerDelegate {
     
     func albumInfoFetchCompleted(albumFromResponse: AlbumResponse) {
-        albumDetailView.setup(album: albumFromResponse.album, artist: .none)
-        //albumDetailView.setNeedsDisplay()
+        
+        let albumTrackTableViewController = AlbumTrackTableViewController(tracks: albumFromResponse.album.tracks.track, nibName: .none, bundle: .none)
+        addChild(albumTrackTableViewController)
+        albumTrackTableViewController.didMove(toParent: self)
+        
+        albumDetailView.setupAlbumInfoSubviews(album: albumFromResponse.album)
+        
+        albumDetailView.setupAlbumInfo(album: albumFromResponse.album, albumTrackView: albumTrackTableViewController.view)
+        
+        fetchArtistInfo()
     }
     
     func artistInfoFetchCompleted(artistFromResponse: ArtistResponse) {
-        albumDetailView.setup(album: .none, artist: artistFromResponse.artist)
-        //albumDetailView.setNeedsDisplay()
+        albumDetailView.setupArtistInfoSubviews(artist: artistFromResponse.artist)
+        albumDetailView.setupArtistInfo(artist: artistFromResponse.artist)
     }
     
     func albumImageFetchCompleted(imageData: Data){
