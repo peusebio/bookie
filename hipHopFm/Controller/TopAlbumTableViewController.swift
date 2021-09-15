@@ -9,6 +9,8 @@ import UIKit
 
 class TopAlbumTableViewController: UITableViewController, AlbumTableViewControllerDelegate {
     
+    let cellId = "AlbumCellId"
+    
     let viewModel: TopAlbumTableViewModel
     private var firstAccessoryButtonTapOccurred: Bool = false
     
@@ -29,14 +31,15 @@ class TopAlbumTableViewController: UITableViewController, AlbumTableViewControll
         
         tableView = UITableView(frame: .zero, style: .grouped)
         tableView.prefetchDataSource = self
-        tableView.register(TopAlbumCell.self, forCellReuseIdentifier: "cellId")
+        tableView.register(TopAlbumCell.self, forCellReuseIdentifier: cellId)
         tableView.showsVerticalScrollIndicator = false
     
         viewModel.fetchAlbums()
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cellId", for: indexPath) as! TopAlbumCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath) as! TopAlbumCell
+        cell.selectionStyle = .none
         
         if indexPath.row >= viewModel.currentAlbumsCount() {
             cell.setup(with: .none, albumPosition: .none)

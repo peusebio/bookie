@@ -16,13 +16,6 @@ class AlbumDetailViewController: UIViewController {
     let albumDetailView: AlbumDetailView
     let viewModel: AlbumDetailViewModel
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        fetchAlbumInfo()
-        view.backgroundColor = Color.random()
-        addAlbumDetailView(albumDetailView: albumDetailView)
-    }
-    
     init(albumMbid: String, artistMbid: String, albumName: String, artistName: String, albumImageData: Data?, albumImageUrl: String, nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         self.albumMbid = albumMbid
         self.artistMbid = artistMbid
@@ -39,6 +32,13 @@ class AlbumDetailViewController: UIViewController {
         }
         
         viewModel.delegate = self
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        fetchAlbumInfo()
+        addAlbumDetailView(albumDetailView: albumDetailView)
     }
     
     func fetchAlbumInfo(){
@@ -81,12 +81,12 @@ extension AlbumDetailViewController: AlbumDetailViewControllerDelegate {
     func albumInfoFetchCompleted(albumFromResponse: AlbumResponse) {
         
         let albumTrackTableViewController = AlbumTrackTableViewController(tracks: albumFromResponse.album.tracks.track, nibName: .none, bundle: .none)
-        addChild(albumTrackTableViewController)
-        albumTrackTableViewController.didMove(toParent: self)
         
+        albumDetailView.setupAlbumInfo(album: albumFromResponse.album, albumTrackView: albumTrackTableViewController.tableView)
         albumDetailView.setupAlbumInfoSubviews(album: albumFromResponse.album)
         
-        albumDetailView.setupAlbumInfo(album: albumFromResponse.album, albumTrackView: albumTrackTableViewController.view)
+        addChild(albumTrackTableViewController)
+        albumTrackTableViewController.didMove(toParent: self)
         
         fetchArtistInfo()
     }

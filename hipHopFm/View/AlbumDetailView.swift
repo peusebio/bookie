@@ -11,13 +11,13 @@ import UIKit
 class AlbumDetailView: UIView {
     
     private let mainScreen = UIScreen.main
-    //private static let defaultLayoutMargins = UIEdgeInsets(top: -20, left: 0, bottom: 0, right: 0)
     
     init (albumName: String, artistName: String){
         super.init(frame: mainScreen.bounds)
         translatesAutoresizingMaskIntoConstraints = false
         albumNameLabel.text = albumName
         artistNameLabel.text = artistName
+        self.backgroundColor = Color.random()
     }
     
     required init?(coder: NSCoder) {
@@ -27,10 +27,9 @@ class AlbumDetailView: UIView {
     let albumImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.contentMode = ContentMode.scaleAspectFill
-        imageView.layer.cornerRadius = 5
+        imageView.contentMode = .scaleAspectFill
+        imageView.layer.cornerRadius = 7.5
         imageView.layer.masksToBounds = true
-        //imageView.layoutMargins = defaultLayoutMargins
         return imageView
     }()
     
@@ -38,7 +37,6 @@ class AlbumDetailView: UIView {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont(name: "Avenir-Heavy", size: 25)
-        label.layoutMargins = UIEdgeInsets(top: -10, left: 0, bottom: 0, right: 0)
         return label;
     }()
     
@@ -54,7 +52,6 @@ class AlbumDetailView: UIView {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont(name: "Avenir", size: 18)
-        //label.layoutMargins = defaultLayoutMargins
         return label;
     }()
     
@@ -62,7 +59,6 @@ class AlbumDetailView: UIView {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont(name: "Avenir", size: 18)
-        //label.layoutMargins = defaultLayoutMargins
         return label;
     }()
     
@@ -70,17 +66,10 @@ class AlbumDetailView: UIView {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont(name: "Avenir", size: 18)
-        //label.layoutMargins = defaultLayoutMargins
         return label;
     }()
     
-    var albumTrackView: UIView = {
-       let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        //view.layoutMargins = defaultLayoutMargins
-        return view;
-        
-    }()
+    var albumTrackView: UIView?
     
     func setupAlbumInfoSubviews(album: Album){
         if let empty = album.image.first?.text.isEmpty {
@@ -88,7 +77,7 @@ class AlbumDetailView: UIView {
                 addSubview(albumImageView)
                 
                 //ALBUM IMAGE VIEW
-                addConstraint(NSLayoutConstraint(item: albumImageView, attribute: .topMargin, relatedBy: .equal, toItem: self, attribute: .topMargin, multiplier: 1, constant: 100))
+                addConstraint(NSLayoutConstraint(item: albumImageView, attribute: .topMargin, relatedBy: .equal, toItem: self, attribute: .topMargin, multiplier: 1, constant: 30))
                 
                 addConstraint(NSLayoutConstraint(item: albumImageView, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 1))
                 
@@ -105,7 +94,7 @@ class AlbumDetailView: UIView {
             //ALBUM NAME LABEL
             addConstraint(NSLayoutConstraint(item: albumNameLabel, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 1))
             
-            addConstraint(NSLayoutConstraint(item: albumNameLabel, attribute: .topMargin, relatedBy: .equal, toItem: lastSubview, attribute: .bottomMargin, multiplier: 1, constant: 10))
+            addConstraint(NSLayoutConstraint(item: albumNameLabel, attribute: .topMargin, relatedBy: .equal, toItem: lastSubview, attribute: .bottomMargin, multiplier: 1, constant: 25))
         }
         
         if !album.artist.isEmpty {
@@ -113,9 +102,9 @@ class AlbumDetailView: UIView {
             addSubview(artistNameLabel)
             
             //ARTIST NAME LABEL
-            addConstraint(NSLayoutConstraint(item: artistNameLabel, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 1))
+            addConstraint(NSLayoutConstraint(item: artistNameLabel, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 0))
             
-            addConstraint(NSLayoutConstraint(item: artistNameLabel, attribute: .topMargin, relatedBy: .equal, toItem: lastSubview, attribute: .bottomMargin, multiplier: 1, constant: 10))
+            addConstraint(NSLayoutConstraint(item: artistNameLabel, attribute: .topMargin, relatedBy: .equal, toItem: lastSubview, attribute: .bottomMargin, multiplier: 1, constant: 20))
         }
         
         if !album.tracks.track.isEmpty {
@@ -124,14 +113,16 @@ class AlbumDetailView: UIView {
             
             //TRACK COUNT LABEL
             addConstraint(NSLayoutConstraint(item: trackCountLabel, attribute: .topMargin, relatedBy: .equal, toItem: lastSubview, attribute: .bottomMargin, multiplier: 1, constant: 30))
-            addConstraint(NSLayoutConstraint(item: trackCountLabel, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 1))
+            addConstraint(NSLayoutConstraint(item: trackCountLabel, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 0))
             
-//            lastSubview = subviews.last
-//            addSubview(albumTrackView)
-//
-//            //ALBUM TRACK VIEW
-//            addConstraint(NSLayoutConstraint(item: albumTrackView, attribute: .topMargin, relatedBy: .equal, toItem: lastSubview, attribute: .bottomMargin, multiplier: 1, constant: 30))
-//            addConstraint(NSLayoutConstraint(item: albumTrackView, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 1))
+            lastSubview = subviews.last
+            addSubview(albumTrackView!)
+
+            //ALBUM TRACK VIEW
+            addConstraint(NSLayoutConstraint(item: albumTrackView!, attribute: .topMargin, relatedBy: .equal, toItem: lastSubview, attribute: .bottomMargin, multiplier: 1, constant: 30))
+            addConstraint(NSLayoutConstraint(item: albumTrackView!, attribute: .leadingMargin, relatedBy: .equal, toItem: self, attribute: .leadingMargin, multiplier: 1, constant: 30))
+            addConstraint(NSLayoutConstraint(item: albumTrackView!, attribute: .trailingMargin, relatedBy: .equal, toItem: self, attribute: .trailingMargin, multiplier: 1, constant: -30))
+            addConstraint(NSLayoutConstraint(item: albumTrackView!, attribute: .height, relatedBy: .equal, toItem: self, attribute: .height, multiplier: 1/4, constant: 0))
         }
         
         if let empty = album.wiki?.published.isEmpty {
@@ -162,31 +153,23 @@ class AlbumDetailView: UIView {
     
     func setupAlbumInfo(album: Album, albumTrackView: UIView) {
         let numberOfTracks = album.tracks.track.count
+        
         if numberOfTracks > 0 {
-//            self.albumTrackView = albumTrackView
-//            self.albumTrackView.translatesAutoresizingMaskIntoConstraints = false
-//            self.albumTrackView.setNeedsDisplay()
+            self.albumTrackView = albumTrackView
+            self.albumTrackView!.translatesAutoresizingMaskIntoConstraints = false
+            //self.albumTrackView!.backgroundColor = self.backgroundColor
             trackCountLabel.text = "💿 \(numberOfTracks) tracks"
-        } else {
-//            trackCountLabel.layoutMargins = .zero
-//            self.albumTrackView.layoutMargins = .zero
         }
+        
         if let wiki = album.wiki {
             publishDateLabel.text = "🗓 Released \(wiki.published.prefix(11))"
-        } else {
-//            publishDateLabel.layoutMargins = .zero
         }
-        setNeedsDisplay()
-        setNeedsLayout()
     }
     
     func setupArtistInfo(artist: Artist) {
         if let stats = artist.stats {
             artistNumberOfListenersLabel.text = "🎧 \(stats.listeners) people listen to this artist"
-        } else {
-//            artistNumberOfListenersLabel.layoutMargins = .zero
         }
-        
     }
     
     func setupImage(imageData: Data?) {
