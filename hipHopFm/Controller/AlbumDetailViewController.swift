@@ -13,22 +13,28 @@ class AlbumDetailViewController: UIViewController {
     let albumMbid: String
     let artistMbid: String
     
-    let albumDetailView: AlbumDetailView
+    let albumDetailScrollView: AlbumDetailScrollView
     let viewModel: AlbumDetailViewModel
+    var retrievingAlbumImageNecessary: Bool = true
+    var albumImageUrl: String?
+    var imageData: Data?
     
-    init(albumMbid: String, artistMbid: String, albumName: String, artistName: String, albumImageData: Data?, albumImageUrl: String, nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+    init(albumMbid: String, artistMbid: String, albumName: String, artistName: String, albumImageData: Data?, albumImageUrl: String, backgroundColor: UIColor, nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         self.albumMbid = albumMbid
         self.artistMbid = artistMbid
-        albumDetailView = AlbumDetailView(albumName: albumName, artistName: artistName)
+        
+        albumDetailScrollView = AlbumDetailScrollView(albumName: albumName, artistName: artistName, backgroundColor: backgroundColor)
+        
         viewModel = AlbumDetailViewModel()
+        
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
-        albumDetailView.translatesAutoresizingMaskIntoConstraints = false
+        albumDetailScrollView.vcDelegate = self
         
         if let imageData = albumImageData {
-            albumDetailView.setupImage(imageData: imageData)
+            self.imageData = imageData
         } else {
-            fetchAlbumImage(imageUrl: albumImageUrl)
+            self.albumImageUrl = albumImageUrl
         }
         
         viewModel.delegate = self
@@ -38,7 +44,6 @@ class AlbumDetailViewController: UIViewController {
         super.viewDidLoad()
         
         fetchAlbumInfo()
-        addAlbumDetailView(albumDetailView: albumDetailView)
     }
     
     func fetchAlbumInfo(){
@@ -63,16 +68,16 @@ class AlbumDetailViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func addAlbumDetailView(albumDetailView: AlbumDetailView) {
+    func setupAlbumDetailView(albumDetailView: AlbumDetailScrollView) {
         view.addSubview(albumDetailView)
         
-        view.addConstraint(NSLayoutConstraint(item: albumDetailView, attribute: .leadingMargin, relatedBy: .equal, toItem: view, attribute: .leadingMargin, multiplier: 1, constant: 0))
+        view.addConstraint(NSLayoutConstraint(item: albumDetailView, attribute: .top, relatedBy: .equal, toItem: view, attribute: .top, multiplier: 1, constant: 0))
         
-        view.addConstraint(NSLayoutConstraint(item: albumDetailView, attribute: .topMargin, relatedBy: .equal, toItem: view, attribute: .topMargin, multiplier: 1, constant: 0))
+        view.addConstraint(NSLayoutConstraint(item: albumDetailView, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1, constant: 0))
         
-        view.addConstraint(NSLayoutConstraint(item: albumDetailView, attribute: .trailingMargin, relatedBy: .equal, toItem: view, attribute: .trailingMargin, multiplier: 1, constant: 0))
+        view.addConstraint(NSLayoutConstraint(item: albumDetailView, attribute: .leading, relatedBy: .equal, toItem: view, attribute: .leading, multiplier: 1, constant: 0))
         
-        view.addConstraint(NSLayoutConstraint(item: albumDetailView, attribute: .bottomMargin, relatedBy: .equal, toItem: view, attribute: .bottomMargin, multiplier: 1, constant: 0))
+        view.addConstraint(NSLayoutConstraint(item: albumDetailView, attribute: .trailing, relatedBy: .equal, toItem: view, attribute: .trailing, multiplier: 1, constant: 0))
     }
 }
 
@@ -80,24 +85,42 @@ extension AlbumDetailViewController: AlbumDetailViewControllerDelegate {
     
     func albumInfoFetchCompleted(albumFromResponse: AlbumResponse) {
         
-        let albumTrackTableViewController = AlbumTrackTableViewController(tracks: albumFromResponse.album.tracks.track, nibName: .none, bundle: .none)
+        if let album = albumFromResponse.album {
+            fetchArtistInfo()
+            if let imageData = self.imageData {
+                albumDetailScrollView.setupImage(imageData: imageData)
+            } else {
+                fetchAlbumImage(imageUrl: albumImageUrl!)
+            }
+            albumDetailScrollView.setupAlbumInfo(album: album)
+            albumDetailScrollView.setupAlbumInfoSubviews(album: album)
+            setupAlbumDetailView(albumDetailView: albumDetailScrollView)
+        } else {
+            configureErrorView()
+        }
+    }
+    
+    func configureErrorView(){
         
-        albumDetailView.setupAlbumInfo(album: albumFromResponse.album, albumTrackView: albumTrackTableViewController.tableView)
-        albumDetailView.setupAlbumInfoSubviews(album: albumFromResponse.album)
+        let errorMessageLabel = UILabel()
+        errorMessageLabel.translatesAutoresizingMaskIntoConstraints = false
+        errorMessageLabel.numberOfLines = 0
+        errorMessageLabel.lineBreakMode = .byWordWrapping
+        errorMessageLabel.text = "🥲 There was an error while retrieving this album's information"
         
-        addChild(albumTrackTableViewController)
-        albumTrackTableViewController.didMove(toParent: self)
-        
-        fetchArtistInfo()
+        view.addSubview(errorMessageLabel)
+        view.addConstraint(NSLayoutConstraint(item: errorMessageLabel, attribute: .centerX, relatedBy: .equal, toItem: view, attribute: .centerX, multiplier: 1, constant: 0))
+        view.addConstraint(NSLayoutConstraint(item: errorMessageLabel, attribute: .centerY, relatedBy: .equal, toItem: view, attribute: .centerY, multiplier: 1, constant: 0))
+        view.addConstraint(NSLayoutConstraint(item: errorMessageLabel, attribute: .width, relatedBy: .equal, toItem: view, attribute: .width, multiplier: 0.75, constant: 1))
     }
     
     func artistInfoFetchCompleted(artistFromResponse: ArtistResponse) {
-        albumDetailView.setupArtistInfoSubviews(artist: artistFromResponse.artist)
-        albumDetailView.setupArtistInfo(artist: artistFromResponse.artist)
+        albumDetailScrollView.setupArtistInfoSubviews(artist: artistFromResponse.artist)
+        albumDetailScrollView.setupArtistInfo(artist: artistFromResponse.artist)
     }
     
     func albumImageFetchCompleted(imageData: Data){
-        albumDetailView.setupImage(imageData: imageData)
+        albumDetailScrollView.setupImage(imageData: imageData)
     }
 }
 

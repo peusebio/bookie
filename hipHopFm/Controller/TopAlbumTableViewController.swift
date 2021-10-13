@@ -85,13 +85,20 @@ class TopAlbumTableViewController: UITableViewController, AlbumTableViewControll
     }
     
     override func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
+        var backgroundColor: UIColor
+        if let cellBgColor = (tableView.cellForRow(at: indexPath) as! TopAlbumCell).backgroundViewColor {
+            backgroundColor = cellBgColor
+        } else {
+            backgroundColor = .black
+        }
+        
         let album = viewModel.albumAt(index: indexPath.row)
         
         let albumMbid = album.mbid
         let artistMbid = album.artist.mbid
         let albumImageData = viewModel.imageData(forAlbumAt: indexPath.row)
         let albumImageUrl = album.image[3].text
-        let albumDetailViewController = AlbumDetailViewController(albumMbid: albumMbid, artistMbid: artistMbid, albumName: album.name, artistName: album.artist.name, albumImageData: albumImageData, albumImageUrl: albumImageUrl, nibName: .none, bundle: .none)
+        let albumDetailViewController = AlbumDetailViewController(albumMbid: albumMbid, artistMbid: artistMbid, albumName: album.name, artistName: album.artist.name, albumImageData: albumImageData, albumImageUrl: albumImageUrl, backgroundColor: backgroundColor, nibName: .none, bundle: .none)
         
         navigationController?.pushViewController(albumDetailViewController, animated: false)
         

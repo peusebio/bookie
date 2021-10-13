@@ -8,5 +8,5 @@
 import Foundation
 
 struct AlbumResponse: Decodable {
-    let album: Album
+    let album: Album?
 }

@@ -9,8 +9,14 @@ import Foundation
 import UIKit
 
 class BaseCell: UITableViewCell {
+    
+    var backgroundViewColor: UIColor?
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        backgroundViewColor = Color.random()
+        
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        
         setupSubviews()
     }
     
@@ -34,7 +40,6 @@ class TopAlbumCell: BaseCell {
         let view = UIView(frame: CGRect())
         view.translatesAutoresizingMaskIntoConstraints = false
         view.layer.cornerRadius = 5
-        view.backgroundColor = Color.random()
         return view
     }()
     
@@ -78,6 +83,8 @@ class TopAlbumCell: BaseCell {
     }()
     
     func setup(with album: TopAlbum?, albumPosition: Int?){
+        cellBackgroundView.backgroundColor = backgroundViewColor
+        
         if let album = album {
             informationLoadingLabel.isHidden = true
             albumImageView.isHidden = false

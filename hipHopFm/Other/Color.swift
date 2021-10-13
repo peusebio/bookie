@@ -15,8 +15,6 @@ class Color {
     
     static var artistNameTextColor = UIColor(red: 30/255, green: 30/255, blue: 30/255, alpha: 1)
     
-    static var x = 0
-    
     static func random() -> UIColor{
         let random = Int.random(in: 0...2)
         var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 1
